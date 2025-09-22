@@ -49,3 +49,8 @@ Skill-Edge is a full-stack EdTech platform that allows users to enroll in online
 - React.js
 - Tailwind CSS + CSS
 - Redux Toolkit (Global State Management)
+
+### Flow Diagram
+
+![Pro2](https://github.com/user-attachments/assets/48cdb528-68ea-483e-93de-ef6b54e3222d)
+
