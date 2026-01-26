@@ -10,7 +10,6 @@ import miscellaneousRoutes from './routes/miscellaneous.routes.js';
 import express from 'express';
 import connectToDb from './config/db.config.js';
 import errorMiddleware from './middleware/error.middleware.js';
-import "./config/services.config.js";
 
 const app = express();
 
