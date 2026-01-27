@@ -37,6 +37,6 @@ app.all('*', (req, res) => {
 app.use(errorMiddleware);
 
 // db init
-connectToDb();
+await connectToDb();
 
 export default app;
