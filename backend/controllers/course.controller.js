@@ -60,7 +60,7 @@ const createCourse = async (req, res, next) => {
 
         // file upload
         if (req.file) {
-            const result = await cloudinary.v2.uploader.upload(req.file.buffer, {
+            const result = await cloudinary.v2.uploader.upload(req.file.path, {
                 folder: 'Learning-Management-System'
             })
 
@@ -106,7 +106,7 @@ const updateCourse = async (req, res, next) => {
         if (req.file) {
             await cloudinary.v2.uploader.destroy(course.thumbnail.public_id);
 
-            const result = await cloudinary.v2.uploader.upload(req.file.buffer, {
+            const result = await cloudinary.v2.uploader.upload(req.file.path, {
                 folder: 'Learning-Management-System'
             })
 
@@ -181,7 +181,7 @@ const addLectureToCourseById = async (req, res, next) => {
         // file upload
         if (req.file) {
             try {
-                const result = await cloudinary.v2.uploader.upload(req.file.buffer, {
+                const result = await cloudinary.v2.uploader.upload(req.file.path, {
                     folder: 'Learning-Management-System',
                     resource_type: "video"
                 });
@@ -277,7 +277,7 @@ const updateCourseLecture = async (req, res, next) => {
 
         if (req.file) {
             try {
-                const result = await cloudinary.v2.uploader.upload(req.file.buffer, {
+                const result = await cloudinary.v2.uploader.upload(req.file.path, {
                     folder: 'Learning-Management-System',
                     resource_type: "video"
                 });

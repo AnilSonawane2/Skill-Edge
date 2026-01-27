@@ -49,7 +49,7 @@ const register = async (req, res, next) => {
         // File upload
         if (req.file) {
             try {
-                const result = await cloudinary.v2.uploader.upload(req.file.buffer, {
+                const result = await cloudinary.v2.uploader.upload(req.file.path, {
                     folder: "Learning-Management-System",
                     width: 250,
                     height: 250,
@@ -290,7 +290,7 @@ const updateUser = async (req, res, next) => {
             await cloudinary.v2.uploader.destroy(user.avatar.public_id);
 
             try {
-                const result = await cloudinary.v2.uploader.upload(req.file.buffer, {
+                const result = await cloudinary.v2.uploader.upload(req.file.path, {
                     folder: 'Learning-Management-System',
                     width: 250,
                     height: 250,
