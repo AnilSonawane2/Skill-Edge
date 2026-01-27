@@ -62,7 +62,7 @@ const register = async (req, res, next) => {
                     user.avatar.secure_url = result.secure_url;
 
                     // Remove the file from the server
-                    fs.rmSync(`uploads/${req.file.filename}`);
+                    // fs.rmSync(`uploads/${req.file.filename}`);
                 }
             } catch (e) {
                 return next(new AppError(e.message || "File not uploaded, please try again", 500));
@@ -303,7 +303,7 @@ const updateUser = async (req, res, next) => {
                     user.avatar.secure_url = result.secure_url;
 
                     // Remove file from server
-                    fs.rmSync(`uploads/${req.file.filename}`);
+                    // fs.rmSync(`uploads/${req.file.filename}`);
 
                 }
             } catch (e) {

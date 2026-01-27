@@ -69,7 +69,7 @@ const createCourse = async (req, res, next) => {
                 course.thumbnail.secure_url = result.secure_url;
             }
 
-            fs.rmSync(`uploads/${req.file.filename}`);
+            // fs.rmSync(`uploads/${req.file.filename}`);
         }
 
         await course.save();
@@ -115,7 +115,7 @@ const updateCourse = async (req, res, next) => {
                 course.thumbnail.secure_url = result.secure_url;
 
                 // Remove file from server
-                fs.rmSync(`uploads/${req.file.filename}`);
+                // fs.rmSync(`uploads/${req.file.filename}`);
 
             }
 
@@ -190,7 +190,7 @@ const addLectureToCourseById = async (req, res, next) => {
                     lectureData.lecture.secure_url = result.secure_url;
                 }
 
-                fs.rmSync(`uploads/${req.file.filename}`);
+                // fs.rmSync(`uploads/${req.file.filename}`);
             } catch (e) {
                  return next(new AppError(e.message, 500));
             }
@@ -291,7 +291,7 @@ const updateCourseLecture = async (req, res, next) => {
                     await cloudinary.v2.uploader.destroy(course.lectures[lectureIndex].lecture.public_id);
                 }
 
-                fs.rmSync(`uploads/${req.file.filename}`);
+                // fs.rmSync(`uploads/${req.file.filename}`);
             } catch (e) {
                 return next(new AppError(e.message, 500));
             }
