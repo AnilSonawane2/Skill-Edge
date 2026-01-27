@@ -1,5 +1,5 @@
 import app from "./app.js";
-const PORT = process.env.PORT;
+// const PORT = process.env.PORT;
 import {v2 as cloudinary} from 'cloudinary';
 import Razorpay from "razorpay"; 
 import dotenv from 'dotenv';
@@ -18,6 +18,8 @@ export const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_SECRET
 })
 
-app.listen(PORT, () => {
+/*app.listen(PORT, () => {
     console.log(`server started at http://localhost:${PORT}`);
-})
+})*/
+
+export default app
