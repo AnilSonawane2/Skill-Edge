@@ -19,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); 
 app.use(morgan('dev'));
 app.use(cors({ origin: [process.env.FRONTEND_URL], credentials: true }));
+app.options("*", cors());
 
 app.get("/", (req, res) => {
   res.send("Backend is running on Vercel 🚀");
