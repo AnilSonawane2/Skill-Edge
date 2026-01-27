@@ -31,7 +31,7 @@ Skill-Edge is a full-stack EdTech platform that allows users to enroll in online
 
 ## 🌐 Live Demo
 
-> Coming Soon...
+> https://skill-edge-frontend.vercel.app/
 
 ## 🚀 Tech Stack
 
