@@ -2,6 +2,21 @@ import courseModel from '../models/course.model.js'
 import AppError from '../utils/error.utils.js';
 import cloudinary from 'cloudinary';
 import fs from 'fs';
+import streamifier from 'streamifier'; 
+
+const uploadToCloudinary = (buffer, options = {}) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.v2.uploader.upload_stream(
+            options,
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+            }
+        );
+
+        streamifier.createReadStream(buffer).pipe(stream);
+    });
+};
 
 // get all courses
 const getAllCourses = async (req, res, next) => {
@@ -60,16 +75,12 @@ const createCourse = async (req, res, next) => {
 
         // file upload
         if (req.file) {
-            const result = await cloudinary.v2.uploader.upload(req.file.path, {
+            const result = await uploadToCloudinary(req.file.buffer, {
                 folder: 'Learning-Management-System'
-            })
+            });
 
-            if (result) {
-                course.thumbnail.public_id = result.public_id;
-                course.thumbnail.secure_url = result.secure_url;
-            }
-
-            // fs.rmSync(`uploads/${req.file.filename}`);
+            course.thumbnail.public_id = result.public_id;
+            course.thumbnail.secure_url = result.secure_url;
         }
 
         await course.save();
@@ -104,21 +115,16 @@ const updateCourse = async (req, res, next) => {
         }
 
         if (req.file) {
-            await cloudinary.v2.uploader.destroy(course.thumbnail.public_id);
-
-            const result = await cloudinary.v2.uploader.upload(req.file.path, {
-                folder: 'Learning-Management-System'
-            })
-
-            if (result) {
-                course.thumbnail.public_id = result.public_id;
-                course.thumbnail.secure_url = result.secure_url;
-
-                // Remove file from server
-                // fs.rmSync(`uploads/${req.file.filename}`);
-
+            if (course.thumbnail.public_id) {
+                await cloudinary.v2.uploader.destroy(course.thumbnail.public_id);
             }
 
+            const result = await uploadToCloudinary(req.file.buffer, {
+                folder: 'Learning-Management-System'
+            });
+
+            course.thumbnail.public_id = result.public_id;
+            course.thumbnail.secure_url = result.secure_url;
         }
 
         await course.save();
@@ -180,21 +186,15 @@ const addLectureToCourseById = async (req, res, next) => {
 
         // file upload
         if (req.file) {
-            try {
-                const result = await cloudinary.v2.uploader.upload(req.file.path, {
-                    folder: 'Learning-Management-System',
-                    resource_type: "video"
-                });
-                if (result) {
-                    lectureData.lecture.public_id = result.public_id;
-                    lectureData.lecture.secure_url = result.secure_url;
-                }
+            const result = await uploadToCloudinary(req.file.buffer, {
+                folder: 'Learning-Management-System',
+                resource_type: 'video'
+            });
 
-                // fs.rmSync(`uploads/${req.file.filename}`);
-            } catch (e) {
-                 return next(new AppError(e.message, 500));
-            }
+            lectureData.lecture.public_id = result.public_id;
+            lectureData.lecture.secure_url = result.secure_url;
         }
+
 
         course.lectures.push(lectureData);
         course.numberOfLectures = course.lectures.length;
@@ -276,26 +276,21 @@ const updateCourseLecture = async (req, res, next) => {
         };
 
         if (req.file) {
-            try {
-                const result = await cloudinary.v2.uploader.upload(req.file.path, {
-                    folder: 'Learning-Management-System',
-                    resource_type: "video"
-                });
-                if (result) {
-                    updatedLectureData.lecture.public_id = result.public_id;
-                    updatedLectureData.lecture.secure_url = result.secure_url;
-                }
-
-                // If there's an existing video, delete the old one from Cloudinary
-                if (course.lectures[lectureIndex].lecture.public_id) {
-                    await cloudinary.v2.uploader.destroy(course.lectures[lectureIndex].lecture.public_id);
-                }
-
-                // fs.rmSync(`uploads/${req.file.filename}`);
-            } catch (e) {
-                return next(new AppError(e.message, 500));
+            if (course.lectures[lectureIndex].lecture.public_id) {
+                await cloudinary.v2.uploader.destroy(
+                    course.lectures[lectureIndex].lecture.public_id,
+                    { resource_type: 'video' }
+                );
             }
-        }
+
+            const result = await uploadToCloudinary(req.file.buffer, {
+                folder: 'Learning-Management-System',
+                resource_type: 'video'
+            });
+
+        updatedLectureData.lecture.public_id = result.public_id;
+        updatedLectureData.lecture.secure_url = result.secure_url;
+    }
 
         // Update the lecture details
         course.lectures[lectureIndex] = updatedLectureData;
