@@ -68,31 +68,29 @@ export default function Checkout() {
   }
 
   useEffect(() => {
-    // Fetch the RazorPay ID
-    (async () => {
-      await dispatch(getRazorPayId());
-    })();
+    dispatch(getRazorPayId());
+  }, [dispatch]);
 
-    // Check the user's subscription status
-    switch (userData?.subscription?.status) {
-      case "active":
-        // Navigate outside of the switch statement
-        navigate("/courses");
-        break;
+  useEffect(() => {
+  if (!userData) return;
 
-      // if already created subscription, then use previous id for this
-      case "created":
-        setSubscription_id(userData?.subscription?.id);
-        break;
+  if (userData.subscription?.status === "active") {
+    navigate("/courses");
+    return;
+  }
 
-      default:
-        // If the user doesn't have a subscription, purchase a bundle
-        (async () => {
-          await dispatch(purchaseCourseBundle());
-        })();
-        break;
-    }
-  }, [dispatch, navigate, userData]);
+  if (userData.subscription?.status === "created") {
+    setSubscription_id(userData.subscription.id);
+    return;
+  }
+
+  // only create subscription if NONE exists
+  dispatch(purchaseCourseBundle());
+
+}, [userData, dispatch, navigate]);
+
+  
+
   return (
     <Layout>
       <section className="flex flex-col gap-6 items-center py-8 px-3 min-h-[100vh]">
