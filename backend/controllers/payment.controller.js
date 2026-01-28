@@ -87,7 +87,7 @@ export const verifySubscription = async (req, res, next) => {
       razorpay_signature
     });
 
-    user.subscription.id = razorpay_subscription_id;
+    user.subscription.id = user.subscription.id;
     user.subscription.status = "active";
     await user.save();
 
