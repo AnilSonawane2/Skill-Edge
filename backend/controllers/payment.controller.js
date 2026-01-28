@@ -55,43 +55,51 @@ export const buySubscription = async (req, res, next) => {
 
 
 export const verifySubscription = async (req, res, next) => {
-    try {
-        const { id } = req.user;
-        const { razorpay_payment_id, razorpay_signature, razorpay_subscription_id } = req.body;
+  try {
+    const { id } = req.user;
+    const {
+      razorpay_payment_id,
+      razorpay_subscription_id,
+      razorpay_signature
+    } = req.body;
 
-        const user = await userModel.findById(id);
-        if (!user) {
-            return next(new AppError('Unauthorised, please login', 500))
-        }
-
-        const subscriptionId = user.subscription.id;
-
-        const generatedSignature = crypto
-            .createHmac("sha256", process.env.RAZORPAY_SECRET)
-            .update(`${razorpay_payment_id}|${subscriptionId}`)
-            .digest('hex');
-
-        if (generatedSignature !== razorpay_signature) {
-            return next(new AppError("Payment Not Verified, please try again", 500))
-        }
-
-        await paymentModel.create({
-            razorpay_payment_id,
-            razorpay_signature,
-            razorpay_subscription_id
-        })
-
-        user.subscription.status = 'active';
-        await user.save();
-
-        res.status(200).json({
-            success: true,
-            message: "Payment Varified Successfully"
-        })
-    } catch (e) {
-        return next(new AppError(e.message, 500))
+    if (!razorpay_payment_id || !razorpay_subscription_id || !razorpay_signature) {
+      return next(new AppError("Invalid payment data", 400));
     }
-}
+
+    const user = await userModel.findById(id);
+    if (!user) {
+      return next(new AppError("Unauthorised", 401));
+    }
+
+    const generatedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_SECRET)
+      .update(`${razorpay_payment_id}|${razorpay_subscription_id}`)
+      .digest("hex");
+
+    if (generatedSignature !== razorpay_signature) {
+      return next(new AppError("Payment verification failed", 400));
+    }
+
+    await paymentModel.create({
+      razorpay_payment_id,
+      razorpay_subscription_id,
+      razorpay_signature
+    });
+
+    user.subscription.id = razorpay_subscription_id;
+    user.subscription.status = "active";
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Subscription activated successfully"
+    });
+  } catch (e) {
+    return next(new AppError(e.message, 500));
+  }
+};
+
 
 export const cancelSubscription = async (req, res, next) => {
     const { id } = req.user;
